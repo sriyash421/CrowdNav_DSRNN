@@ -146,3 +146,17 @@ class Config(object):
     training.load_path = None  # if resume = True, load from the following checkpoint
     training.overwrite = True  # whether to overwrite the output directory in training
     training.num_threads = 1  # number of threads used for intraop parallelism on CPU
+
+    def __dict__(self):
+        return {
+            "orca.neighbor_dist": self.orca.neighbor_dist,
+            "orca.safety_space": self.orca.safety_space,
+            "orca.time_horizon": self.orca.time_horizon,
+            "orca.time_horizon_obst": self.orca.time_horizon_obst,
+            "sf.A": self.sf.A,
+            "sf.B": self.sf.B,
+            "sf.KI": self.sf.KI,
+            "noise.add_noise": self.noise.add_noise,
+            "noise.type": self.noise.type,
+            "noise.magnitude": self.noise.magnitude,
+        }
