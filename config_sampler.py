@@ -2,11 +2,13 @@ import numpy as np
 from crowd_nav.configs.config import Config, BaseConfig
 
 
-class SimpleConfigSampler(object):
-    def __init__(self, seed):
-        self.random = np.self.random.RandomState(seed=seed)
+class SimpleConfigSampler():
+    def __init__(self):
+        self.random = np.random.RandomState()
 
-    def sample(self):
+    def sample(self, seed):
+        self.random = np.random.RandomState(seed=seed)
+        
         config = Config()
         config.humans.policy = "mix"
         config.robot.policy = config.humans.policy
@@ -15,34 +17,32 @@ class SimpleConfigSampler(object):
         config.robot.visible = True
 
         # config for ORCA
-        orca = BaseConfig()
-        orca.neighbor_dist = self.random.uniform(0, 10)
-        orca.safety_space = self.random.uniform(0, 1)
-        orca.time_horizon = self.random.uniform(0, 10)
-        orca.time_horizon_obst = self.random.uniform(0, 10)
+        config.orca.neighbor_dist = self.random.uniform(0, 10)
+        config.orca.safety_space = self.random.uniform(0, 1)
+        config.orca.time_horizon = self.random.uniform(0, 10)
+        config.orca.time_horizon_obst = self.random.uniform(0, 10)
 
         # social force
-        sf = BaseConfig()
-        sf.A = self.random.uniform(0, 10)  # Strenght of interaction
-        sf.B = self.random.uniform(0, 10) + 1e-8  # Range of interaction
-        sf.KI = self.random.uniform(0, 10) + 1e-8  # Goal Strength
+        config.sf.A = self.random.uniform(0, 10)  # Strenght of interaction
+        config.sf.B = self.random.uniform(0, 10) + 1e-8  # Range of interaction
+        config.sf.KI = self.random.uniform(0, 10) + 1e-8  # Goal Strength
 
-        noise = BaseConfig()
-        noise.add_noise = True
+        config.noise.add_noise = True
         # uniform, gaussian
-        noise.type = "uniform"
-        noise.magnitude = self.random.uniform(0, 0.2)
-
+        config.noise.type = "uniform"
+        config.noise.magnitude = self.random.uniform(0, 0.2)
         return config
 
 
-class GaussianConfigSampler(object):
-    def __init__(self, seed, scale=0.5, p=0.5):
+class GaussianConfigSampler():
+    def __init__(self, scale=0.5, p=0.5):
         self.sc = scale
         self.p = p
-        self.random = np.self.random.RandomState(seed=seed)
+        self.random = np.random.RandomState()
 
-    def sample(self):
+    def sample(self, seed):
+        self.random = np.random.RandomState(seed=seed)
+
         config = Config()
         config.humans.policy = "mix"
         config.robot.policy = config.humans.policy
@@ -80,13 +80,15 @@ class GaussianConfigSampler(object):
         return config
 
 
-class FullConfigSampler(object):
-    def __init__(self, seed, scale=0.5, p=0.5):
+class FullConfigSampler():
+    def __init__(self, scale=0.5, p=0.5):
         self.sc = scale
         self.p = p
-        self.random = np.self.random.RandomState(seed=seed)
+        self.random = np.random.RandomState()
 
-    def sample(self):
+    def sample(self, seed):
+        self.random = np.random.RandomState(seed=seed)
+
         config = Config()
 
         config.sim.train_val_sim = "circle_crossing" if self.random.uniform(
