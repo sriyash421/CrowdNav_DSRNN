@@ -88,7 +88,7 @@ class CrowdSim(gym.Env):
         self.discomfort_dist_front = config.reward.discomfort_dist_front
         self.discomfort_penalty_factor = config.reward.discomfort_penalty_factor
 
-        if self.config.humans.policy == 'orca' or self.config.humans.policy == 'social_force':
+        if self.config.humans.policy == 'orca' or self.config.humans.policy == 'social_force' or self.config.humans.policy == 'mix':
             self.case_capacity = {'train': np.iinfo(np.uint32).max - 2000, 'val': 1000, 'test': 1000}
             self.case_size = {'train': np.iinfo(np.uint32).max - 2000, 'val': self.config.env.val_size,
                               'test': self.config.env.test_size}
@@ -172,7 +172,7 @@ class CrowdSim(gym.Env):
 
 
     def set_robot(self, robot):
-        raise NotImplementedError
+        self.robot = robot
 
 
     def generate_random_human_position(self, human_num):
@@ -855,13 +855,13 @@ class CrowdSim(gym.Env):
             human_actions.append(human.act(ob))
         return human_actions
 
-    def step(self, action, update=True):
+    def step(self, action, update=True, store_actions=False):
         """
         Compute actions for all agents, detect collision, update environment and return (ob, reward, done, info)
         """
 
         # clip the action to obey robot's constraint
-        action = self.robot.policy.clip_action(action, self.robot.v_pref)
+        # action = self.robot.policy.clip_action(action, self.robot.v_pref)
 
         # step all humans
         human_actions = self.get_human_actions()
@@ -876,6 +876,9 @@ class CrowdSim(gym.Env):
         for i, human_action in enumerate(human_actions):
             self.humans[i].step(human_action)
         self.global_time += self.time_step # max episode length=time_limit/time_step
+
+        if store_actions:
+            self.actions = human_actions + [action]
 
         ##### compute_ob goes here!!!!!
         ob = self.generate_ob(reset=False)
