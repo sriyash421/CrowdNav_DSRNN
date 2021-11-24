@@ -5,6 +5,7 @@ import logging
 from crowd_nav.policy.policy_factory import policy_factory
 from crowd_sim.envs.utils.action import ActionXY, ActionRot
 from crowd_sim.envs.utils.state import ObservableState, FullState, ObservableState_noV
+from crowd_sim.envs.utils.ballbot_dynamics import BallbotDynamics
 
 
 class Agent(object):
@@ -30,6 +31,15 @@ class Agent(object):
         self.theta = None
         self.time_step = config.env.time_step
         self.policy.time_step = config.env.time_step
+
+        self.dynamics = 'linear' if section == 'humans' else config.dynamics
+        if self.dynamics == "ballbot":
+            self._dynamics = BallbotDynamics(self)
+            self.compute_position = self._dynamics.compute_position
+            self.step = self._dynamics.step
+            self.max_lean = config.ballbot.max_lean
+            self.ballbot_init = config.ballbot.init
+            assert (self.kinematics == 'holonomic')
 
 
     def print_info(self):
@@ -58,6 +68,18 @@ class Agent(object):
             self.radius = radius
         if v_pref is not None:
             self.v_pref = v_pref
+        
+        if self.dynamics == "ballbot":
+            #TODO: check random initialization
+            if self.ballbot_init == 'random':
+                theta = np.random.random() * np.pi * 2
+                lean = (self.max_lean / 2) * np.random.random()
+                self._dynamics.theta_ego_frame = np.array([lean * np.cos(theta), lean * np.sin(theta)], dtype='float64')
+                self._dynamics.theta_dot_ego_frame = np.random.random(size=(2,)) * 0.1
+            else:
+                self._dynamics.theta_ego_frame = np.array([0.0, 0.0], dtype='float64')
+                self._dynamics.theta_dot_ego_frame = np.array([0.0, 0.0], dtype='float64')
+            self._dynamics.lean_angles = list()
 
     # self.px, self.py, self.vx, self.vy, self.radius, self.gx, self.gy, self.v_pref, self.theta
     def set_list(self, px, py, vx, vy, radius, gx, gy, v_pref, theta):

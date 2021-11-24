@@ -141,10 +141,23 @@ class Config(object):
     training.log_interval = 20  # log interval, one log per n updates
     training.use_proper_time_limits = False  # compute returns taking into account time limits
     training.cuda_deterministic = False  # sets flags for determinism when using CUDA (potentially slow!)
-    training.cuda = True  # use CUDA for training
+    training.cuda = False  # use CUDA for training
     training.num_processes = 12 # how many training CPU processes to use
-    training.output_dir = 'data/dummy'  # the saving directory for train.py
+    training.output_dir = 'data/linear_dynamics'  # the saving directory for train.py
     training.resume = False  # resume training from an existing checkpoint or not
     training.load_path = None  # if resume = True, load from the following checkpoint
     training.overwrite = True  # whether to overwrite the output directory in training
     training.num_threads = 1  # number of threads used for intraop parallelism on CPU
+
+    # BallBot Dynamics
+    dynamics = 'ballbot'
+    if dynamics == 'ballbot':
+        ballbot = BaseConfig()
+        ballbot.max_lean = 5
+        ballbot.lean_penalty = 0.0
+        ballbot.fall_penalty = 0.0
+        ballbot.init = 'zeros'
+        action_space.kinematics = "unicycle"
+        training.resume = True  # resume training from an existing checkpoint or not
+        training.load_path = 'data/example_model_unicycle/checkpoints/55554.pt'  # if resume = True, load from the following checkp
+        training.output_dir = f'data/ballbot_dynamics_{ballbot.init}_resume{training.resume}_base-reward'  # the saving directory for train.py

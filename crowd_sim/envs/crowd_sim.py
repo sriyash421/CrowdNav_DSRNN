@@ -80,6 +80,8 @@ class CrowdSim(gym.Env):
     def configure(self, config):
         self.config = config
 
+        self.dynamics = config.dynamics
+
         self.time_limit = config.env.time_limit
         self.time_step = config.env.time_step
         self.randomize_attributes = config.env.randomize_attributes
@@ -100,6 +102,11 @@ class CrowdSim(gym.Env):
 
         else:
             raise NotImplementedError
+
+        if self.dynamics == 'ballbot':
+            self.lean_penalty = config.ballbot.lean_penalty
+            self.fall_penalty = config.ballbot.fall_penalty
+
         self.case_counter = {'train': 0, 'test': 0, 'val': 0}
 
         logging.info('human number: {}'.format(self.human_num))
@@ -789,6 +796,15 @@ class CrowdSim(gym.Env):
                 r_back = 0.
             # print(reward, r_spin, r_back)
             reward = reward + r_spin + r_back
+
+        if self.robot.dynamics == 'ballbot':
+            lean_angle = np.linalg.norm(self.robot._dynamics.theta_ego_frame)
+            if lean_angle > self.robot.max_lean and not done:
+                reward = self.fall_penalty
+                done = True
+                info = FallenOver()
+            else:
+                reward += self.lean_penalty * (lean_angle/self.robot.max_lean)
 
         return reward, done, episode_info
 
