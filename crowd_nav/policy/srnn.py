@@ -22,6 +22,9 @@ class SRNN(Policy):
         thus the reward function is needed
 
         """
+		if self.config.action_space.discrete:
+			return self.config.action_space.actions[raw_action]
+
 		# quantize the action
 		holonomic = True if self.config.action_space.kinematics == 'holonomic' else False
 		# clip the action

@@ -39,7 +39,6 @@ class Agent(object):
             self.step = self._dynamics.step
             self.max_lean = config.ballbot.max_lean
             self.ballbot_init = config.ballbot.init
-            assert (self.kinematics == 'holonomic')
 
 
     def print_info(self):

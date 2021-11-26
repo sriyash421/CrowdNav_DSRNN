@@ -1,4 +1,5 @@
 import numpy as np
+from crowd_sim.crowd_sim.utils.action import ActionRot, ActionXY
 
 def wrap(angle):
     while angle >= np.pi:
@@ -73,8 +74,16 @@ class BallbotDynamics(object):
     
         """
         self.agent.check_validity(action)
-        # selected_speed = action.v
-        # selected_heading_global = wrap(action.r + self.agent.theta)
+        if self.kinematics == 'holonomic':
+            assert(isinstance(action, ActionXY))
+            v_body_x_ref = action.vx
+            v_body_y_ref = action.vy
+        else:
+            assert(isinstance(action, ActionRot))
+            selected_speed = action.v
+            selected_heading_global = wrap(action.r + self.agent.theta)
+            v_body_x_ref = selected_speed * np.cos(selected_heading_global)
+            v_body_y_ref = selected_speed * np.sin(selected_heading_global)
 
         # States: [theta_x, theta_dot_x, vx, theta_y, theta_dot_y, vy, x, y]
         theta_body_x = self.theta_ego_frame[0]
@@ -91,10 +100,8 @@ class BallbotDynamics(object):
         # Inputs: [theta_x_ref, theta_dot_x_ref, v_body_x_ref, theta_y_ref, theta_dot_y_ref, v_y_ref]
         theta_body_x_ref = 0
         theta_body_dot_x_ref = 0
-        v_body_x_ref = action.vx #selected_speed * np.cos(selected_heading_global)
         theta_body_ref_y = 0
         theta_body_dot_ref_y = 0
-        v_body_y_ref = action.vy #selected_speed * np.sin(selected_heading_global)
 
         adjuster_thresh = 0.5
         v_body_x_ref, v_body_y_ref = velocity_adjuster(v_body_x_ref, v_body_y_ref, v_body_x, v_body_y, adjuster_thresh)

@@ -36,8 +36,15 @@ class CrowdSimDict(CrowdSim):
         d['spatial_edges'] = gym.spaces.Box(low=-np.inf, high=np.inf, shape=(self.human_num, 2), dtype=np.float32)
         self.observation_space=gym.spaces.Dict(d)
 
-        high = np.inf * np.ones([2, ])
-        self.action_space = gym.spaces.Box(-high, high, dtype=np.float32)
+        if self.config.action_space.discrete:
+            self.action_space = gym.spaces.Discrete(self.config.action_space.num_actions)
+            if self.action_space.kinematics == 'unicycle':
+                self.robot.policy.actions = [ActionRot(v[0], v[1]) for v in self.config.action_space.actions]
+            else:
+                self.robot.policy.actions = [ActionXY(v[0], v[1]) for v in self.config.action_space.actions]
+        else:
+            high = np.inf * np.ones([2, ])
+            self.action_space = gym.spaces.Box(-high, high, dtype=np.float32)
 
 
     # generate observation for each timestep
@@ -121,9 +128,9 @@ class CrowdSimDict(CrowdSim):
         """
         action = self.robot.policy.clip_action(action, self.robot.v_pref)
 
-        if self.robot.kinematics == 'unicycle':
-            self.desiredVelocity[0] = np.clip(self.desiredVelocity[0]+action.v,-self.robot.v_pref,self.robot.v_pref)
-            action=ActionRot(self.desiredVelocity[0], action.r)
+        # if self.robot.kinematics == 'unicycle':
+        #     self.desiredVelocity[0] = np.clip(self.desiredVelocity[0]+action.v,-self.robot.v_pref,self.robot.v_pref)
+        #     action=ActionRot(self.desiredVelocity[0], action.r)
 
 
         human_actions = self.get_human_actions()
