@@ -105,6 +105,7 @@ def main():
 							  recurrent_cell_type=recurrent_cell)
 
 	if config.training.resume: #retrieve the model if resume = True
+		load_path = config.training.load_path
 		actor_critic.load_state_dict(torch.load(load_path, map_location=device))
 
 
