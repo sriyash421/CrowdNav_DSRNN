@@ -62,6 +62,7 @@ def main():
 
 
 	logging.info('Create other envs with new settings')
+	logging.info('Logging to {} '.format(config.training.output_dir))
 
 
 	# For fastest training: use GRU
@@ -106,7 +107,12 @@ def main():
 
 	if config.training.resume: #retrieve the model if resume = True
 		load_path = config.training.load_path
-		actor_critic.load_state_dict(torch.load(load_path, map_location=device))
+		bootstrap_model = torch.load(load_path, map_location=device)
+		# actor_critic.load_state_dict()
+		for name, param in bootstrap_model.items():
+			if 'critic' in name:
+					continue
+			actor_critic.state_dict()[name].copy_(param)
 
 
 	# allow the usage of multiple GPUs to increase the number of examples processed simultaneously

@@ -2,6 +2,7 @@ import gym
 import numpy as np
 from numpy.linalg import norm
 import copy
+import logging
 from crowd_sim.envs.utils.action import ActionRot, ActionXY
 from crowd_sim.envs import CrowdSim
 
@@ -38,10 +39,6 @@ class CrowdSimDict(CrowdSim):
 
         if self.config.action_space.discrete:
             self.action_space = gym.spaces.Discrete(self.config.action_space.num_actions)
-            if self.action_space.kinematics == 'unicycle':
-                self.robot.policy.actions = [ActionRot(v[0], v[1]) for v in self.config.action_space.actions]
-            else:
-                self.robot.policy.actions = [ActionXY(v[0], v[1]) for v in self.config.action_space.actions]
         else:
             high = np.inf * np.ones([2, ])
             self.action_space = gym.spaces.Box(-high, high, dtype=np.float32)
@@ -67,7 +64,7 @@ class CrowdSimDict(CrowdSim):
         for i in range(self.human_num):
             relative_pos = np.array([self.last_human_states[i, 0] - self.robot.px, self.last_human_states[i, 1] - self.robot.py])
             ob['spatial_edges'][i] = relative_pos
-
+        # print(ob)'
         return ob
 
 
@@ -128,10 +125,9 @@ class CrowdSimDict(CrowdSim):
         """
         action = self.robot.policy.clip_action(action, self.robot.v_pref)
 
-        # if self.robot.kinematics == 'unicycle':
-        #     self.desiredVelocity[0] = np.clip(self.desiredVelocity[0]+action.v,-self.robot.v_pref,self.robot.v_pref)
-        #     action=ActionRot(self.desiredVelocity[0], action.r)
-
+        if self.robot.kinematics == 'unicycle' and self.dynamics == 'differential_drive':
+            self.desiredVelocity[0] = np.clip(self.desiredVelocity[0]+action.v,-self.robot.v_pref,self.robot.v_pref)
+            action=ActionRot(self.desiredVelocity[0], action.r)
 
         human_actions = self.get_human_actions()
 

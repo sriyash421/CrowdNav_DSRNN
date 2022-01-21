@@ -1,5 +1,5 @@
 import numpy as np
-from crowd_sim.crowd_sim.utils.action import ActionRot, ActionXY
+from crowd_sim.envs.utils.action import ActionRot, ActionXY
 
 def wrap(angle):
     while angle >= np.pi:
@@ -74,7 +74,7 @@ class BallbotDynamics(object):
     
         """
         self.agent.check_validity(action)
-        if self.kinematics == 'holonomic':
+        if self.agent.kinematics == 'holonomic':
             assert(isinstance(action, ActionXY))
             v_body_x_ref = action.vx
             v_body_y_ref = action.vy

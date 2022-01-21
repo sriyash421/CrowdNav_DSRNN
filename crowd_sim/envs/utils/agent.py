@@ -39,6 +39,10 @@ class Agent(object):
             self.step = self._dynamics.step
             self.max_lean = config.ballbot.max_lean
             self.ballbot_init = config.ballbot.init
+        
+        if section != 'humans':
+            logging.info('Robot is {}, has {} kinematic constraint and follows {} dynamics'.format(
+            'visible' if self.visible else 'invisible', self.kinematics, self.dynamics))
 
 
     def print_info(self):
@@ -167,23 +171,23 @@ class Agent(object):
             py = self.py + action.vy * delta_t
         # unicycle
         else:
-            # naive dynamics
-            # theta = self.theta + action.r * delta_t # if action.r is w
-            # # theta = self.theta + action.r # if action.r is delta theta
-            # px = self.px + np.cos(theta) * action.v * delta_t
-            # py = self.py + np.sin(theta) * action.v * delta_t
-
             # differential drive
-            epsilon = 0.0001
-            if abs(action.r) < epsilon:
-                R = 0
+            if self.dynamics == 'differential_drive':
+                epsilon = 0.0001
+                if abs(action.r) < epsilon:
+                    R = 0
+                else:
+                    w = action.r/delta_t # action.r is delta theta
+                    R = action.v/w
+
+                px = self.px - R * np.sin(self.theta) + R * np.sin(self.theta + action.r)
+                py = self.py + R * np.cos(self.theta) - R * np.cos(self.theta + action.r)
+            # naive dynamics
             else:
-                w = action.r/delta_t # action.r is delta theta
-                R = action.v/w
-
-            px = self.px - R * np.sin(self.theta) + R * np.sin(self.theta + action.r)
-            py = self.py + R * np.cos(self.theta) - R * np.cos(self.theta + action.r)
-
+                theta = self.theta + action.r * delta_t # if action.r is w
+                # theta = self.theta + action.r # if action.r is delta theta
+                px = self.px + np.cos(theta) * action.v * delta_t
+                py = self.py + np.sin(theta) * action.v * delta_t
 
         return px, py
 

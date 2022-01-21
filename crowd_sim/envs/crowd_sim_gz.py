@@ -11,6 +11,8 @@ from crowd_sim.envs.utils.info import *
 from crowd_nav.policy.orca import ORCA
 from crowd_sim.envs.utils.state import *
 
+import yaml
+
 
 from crowd_nav.policy.policy_factory import policy_factory
 
@@ -194,8 +196,10 @@ class CrowdSim(gym.Env):
         :return:
         """
         # initial min separation distance to avoid danger penalty at beginning
+        with open("/home/herb/WRK/CrowdNav_DSRNN/crowd_sim/envs/5agent_1.yaml", "r") as stream:
+            stored_points = yaml.safe_load(stream)
         for i in range(human_num):
-            self.humans.append(self.generate_circle_crossing_human())
+            self.humans.append(self.generate_lab_simulation(i, stored_points))
 
 
     # generate and return a static human
@@ -523,7 +527,8 @@ class CrowdSim(gym.Env):
                     break
                 increment_angle = increment_angle + 0.2
 
-            self.robot.set(px_r, py_r, gx, gy, 0, 0, np.pi / 2)
+            # self.robot.set(px_r, py_r, gx, gy, 0, 0, np.pi / 2)
+            self.robot.set(0, 0, 3.6, 4.5, 0, 0, np.pi / 2)
 
         # for FoV environment
         else:
@@ -543,7 +548,8 @@ class CrowdSim(gym.Env):
                     px, py, gx, gy = np.random.uniform(-self.circle_radius, self.circle_radius, 4)
                     if np.linalg.norm([px - gx, py - gy]) >= 6:
                         break
-                self.robot.set(px, py, gx, gy, 0, 0, np.pi/2)
+                # self.robot.set(px, py, gx, gy, 0, 0, np.pi/2)
+                self.robot.set(0, 0, 3.6, 4.5, 0, 0, -np.pi / 2)
 
 
             # generate humans
@@ -818,7 +824,7 @@ class CrowdSim(gym.Env):
             # potential reward
             potential_cur = np.linalg.norm(
                 np.array([self.robot.px, self.robot.py]) - np.array(self.robot.get_goal_position()))
-            reward = 3 * (-abs(potential_cur) - self.potential)
+            reward = 2 * (-abs(potential_cur) - self.potential)
             self.potential = -abs(potential_cur)
 
             done = False
@@ -965,6 +971,7 @@ class CrowdSim(gym.Env):
         from matplotlib import patches
 
         plt.rcParams['animation.ffmpeg_path'] = '/usr/bin/ffmpeg'
+        plt.rcParams['figure.figsize'] = [10, 8]
 
         robot_color = 'yellow'
         goal_color = 'red'
@@ -987,6 +994,8 @@ class CrowdSim(gym.Env):
 
 
         ax=self.render_axis
+        ax.set_xlim(-2, 6)
+        ax.set_ylim(-2, 6)
         artists=[]
 
         # add goal

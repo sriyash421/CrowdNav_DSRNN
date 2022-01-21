@@ -23,7 +23,11 @@ class SRNN(Policy):
 
         """
 		if self.config.action_space.discrete:
-			return self.config.action_space.actions[raw_action]
+			raw_action = self.config.action_space.actions[raw_action]
+			if self.config.action_space.kinematics == 'unicycle':
+				return ActionRot(v_pref * raw_action[0], raw_action[1])
+			else:
+				return ActionXY(v_pref * raw_action[0], v_pref * raw_action[1])
 
 		# quantize the action
 		holonomic = True if self.config.action_space.kinematics == 'holonomic' else False

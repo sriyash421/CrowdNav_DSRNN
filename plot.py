@@ -22,7 +22,7 @@ def smooth(vals, window):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--paths', nargs='+', default=[])
-parser.add_argument('--window', default=5)
+parser.add_argument('--window', type=int, default=5)
 args = parser.parse_args()
 
 paths = args.paths

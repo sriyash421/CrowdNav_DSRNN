@@ -75,6 +75,12 @@ def evaluate(actor_critic, ob_rms, eval_envs, num_processes, device, config, log
                     eval_recurrent_hidden_states,
                     eval_masks,
                     deterministic=True)
+                
+                with open("/home/herb/debug_obs.log", "a") as fout:
+                    fout.write('ob: {}\n'.format(obs))
+                    fout.write('raw_action: {}\n'.format(action))
+                    fout.write('eval_recurrent_hidden_states: {}\n'.format(eval_recurrent_hidden_states))
+                    fout.write("\n\n\n\n")
             if not done:
                 global_time = baseEnv.global_time
             if visualize:

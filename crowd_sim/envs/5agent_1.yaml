@@ -1,0 +1,40 @@
+sphere1:
+  goal:
+    - [ 0.23, -0.67 ]
+  start:
+    - [ 3.63, 5.0 ]
+
+  radius: 0.3
+
+sphere2:
+  goal:
+    - [ -0.38, 0.87 ]
+  start:
+    - [ 3.02, 0.87 ]
+
+  radius: 0.3
+
+sphere3:
+  goal:
+    - [ 0.55, 4.84 ]
+  start:
+    - [ 3.95, -0.83 ]
+
+  radius: 0.3
+
+sphere4:
+  goal:
+    - [ 3.02, -1.63 ]
+  start:
+    - [ -0.38, 4.03 ]
+
+  radius: 0.3
+
+sphere5:
+  goal:
+    - [ 3.75, 2.25 ]
+  start:
+    - [ 0.35, 2.25 ]
+
+  radius: 0.3
+

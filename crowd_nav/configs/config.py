@@ -26,6 +26,14 @@ class Config(object):
     # discomfort distance for the back half of the robot
     reward.discomfort_dist_back = 0.25
     reward.discomfort_penalty_factor = 10
+    # reward = BaseConfig()
+    # reward.success_reward = 1
+    # reward.collision_penalty = -1
+    # # discomfort distance for the front half of the robot
+    # reward.discomfort_dist_front = 0.4
+    # # discomfort distance for the back half of the robot
+    # reward.discomfort_dist_back = 0.4
+    # reward.discomfort_penalty_factor = 1
     reward.gamma = 0.99  # discount factor for rewards
 
     # environment settings
@@ -85,6 +93,17 @@ class Config(object):
     action_space = BaseConfig()
     # holonomic or unicycle
     action_space.kinematics = "holonomic"
+    action_space.discrete = False
+
+
+    if action_space.discrete:
+        action_space.actions = np.mgrid[1.0:1.1:0.5, -np.pi / 6:np.pi / 6 + 0.01:np.pi / 12].reshape(2, -1).T
+        action_space.actions = np.vstack(
+            [action_space.actions, np.mgrid[0.5:0.6:0.5, -np.pi / 6:np.pi / 6 + 0.01:np.pi / 6].reshape(2, -1).T])
+        action_space.actions = np.vstack(
+            [action_space.actions, np.mgrid[0.0:0.1:0.5, -np.pi / 6:np.pi / 6 + 0.01:np.pi / 6].reshape(2, -1).T])
+        action_space.kinematics = "unicycle"
+        action_space.num_actions = len(action_space.actions)
 
     # config for ORCA
     orca = BaseConfig()
@@ -153,11 +172,10 @@ class Config(object):
     dynamics = 'ballbot'
     if dynamics == 'ballbot':
         ballbot = BaseConfig()
-        ballbot.max_lean = 5
-        ballbot.lean_penalty = 0.0
-        ballbot.fall_penalty = 0.0
+        ballbot.max_lean = 0.25
+        ballbot.lean_penalty = -2.5
+        ballbot.fall_penalty = -20
         ballbot.init = 'zeros'
-        action_space.kinematics = "unicycle"
         training.resume = True  # resume training from an existing checkpoint or not
-        training.load_path = 'data/example_model_unicycle/checkpoints/55554.pt'  # if resume = True, load from the following checkp
-        training.output_dir = f'data/ballbot_dynamics_{ballbot.init}_resume{training.resume}_base-reward'  # the saving directory for train.py
+        training.load_path = 'data/example_model/checkpoints/27776.pt'  # if resume = True, load from the following checkp
+        training.output_dir = f'ballbot_final/only_actor_fix_potential_2'  # the saving directory for train.py
