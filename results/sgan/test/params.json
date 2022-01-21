@@ -1,0 +1,32 @@
+{
+    "dt": 0.25,
+    "prediction_horizon": 1.2,
+    "history_length": 8,
+    "action": {
+        "span": 360,
+        "n_actions": 20
+    },
+    "cost": {
+        "sigma": {
+            "h": 5.0,
+            "s": 0.66,
+            "r": 5.0
+        },
+        "q": {
+            "obs": 20.0,
+            "goal": 5.0,
+            "wind": 1.0,
+            "dev": 0.0
+        },
+        "discrete_cost_type": "entropy"
+    },
+    "predictor": {
+        "path": "sgan.pt",
+        "use_gpu": false,
+        "num_samples": 20,
+        "deviation_penalty": true,
+        "use_sgan_action": false
+    },
+    "log_cost": true,
+    "prediction_length": 1.5
+}

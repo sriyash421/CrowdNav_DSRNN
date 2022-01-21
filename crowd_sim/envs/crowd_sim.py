@@ -174,7 +174,8 @@ class CrowdSim(gym.Env):
 
 
     def set_robot(self, robot):
-        raise NotImplementedError
+        # raise NotImplementedError
+        self.robot = robot
 
 
     # add all generated humans to the self.humans list

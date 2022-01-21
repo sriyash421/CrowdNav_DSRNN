@@ -33,4 +33,7 @@ class Policy(object):
             return True
         else:
             return False
+    
+    def clip_action(self, action, vpref):
+        return action
 

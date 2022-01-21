@@ -1,0 +1,31 @@
+model_predictor: SGAN
+params:
+  dt: 0.2
+  prediction_horizon: 1.2
+  history_length: 8
+
+  action:
+    span: 360
+    n_actions: 20
+  
+  cost: # Only applicable to MPC controller
+    sigma:
+      h: 5.0
+      s: 0.66
+      r: 5.0
+    q:
+      obs: 20.0
+      goal: 5.0
+      wind: 1.0
+      dev: 0.0
+    
+    discrete_cost_type: "entropy"
+  
+  predictor:
+    path: sgan.pt
+    use_gpu: False
+    num_samples: 20
+    deviation_penalty: True
+    use_sgan_action: False
+  
+  log_cost: True

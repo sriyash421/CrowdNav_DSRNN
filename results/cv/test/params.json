@@ -1,0 +1,24 @@
+{
+    "dt": 0.25,
+    "prediction_horizon": 1.2,
+    "history_length": 1,
+    "log_cost": true,
+    "action": {
+        "span": 360,
+        "n_actions": 10
+    },
+    "cost": {
+        "sigma": {
+            "h": 2.5,
+            "s": 2.5,
+            "r": 2.5
+        },
+        "q": {
+            "obs": 6.0,
+            "goal": 5.0,
+            "wind": 0.0
+        },
+        "discrete_cost_type": "winding"
+    },
+    "prediction_length": 1.5
+}
