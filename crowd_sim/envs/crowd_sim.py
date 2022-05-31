@@ -75,6 +75,8 @@ class CrowdSim(gym.Env):
 
         self.potential = None
 
+        self.test_setting = None
+
 
     # configurate the environment with the given config
     def configure(self, config):
@@ -170,6 +172,7 @@ class CrowdSim(gym.Env):
         rob_RL = Robot(config, 'robot')
         self.set_robot(rob_RL)
 
+        self.test_setting = config.test_setting
         return
 
 
@@ -186,9 +189,33 @@ class CrowdSim(gym.Env):
         :return:
         """
         # initial min separation distance to avoid danger penalty at beginning
-        for i in range(human_num):
-            self.humans.append(self.generate_circle_crossing_human())
+        if self.test_setting == "cooperative":
+            assert(human_num == 3)
+            for i in range(human_num):
+                self.humans.append(self.generate_cooperative_human(i))
+        elif self.test_setting == "aggressive" or self.test_setting == "distracted":
+            assert(human_num == 1)
+            self.humans.append(self.generate_noncooperative_human())
+        else:
+            for i in range(human_num):
+                self.humans.append(self.generate_circle_crossing_human())
 
+    def generate_cooperative_human(self, i):
+        if i == 0:
+            p = (0, 4.5)
+            g = (3.6, 0)
+        elif i == 1:
+            p = (3.6, 4.5)
+            g = (0, 0)
+        else:
+            p = (3.6, 0)
+            g = (0, 4.5)
+            
+        human = Human(self.config, 'humans')
+        px, py = np.random.random(size=2) * 0.1 + p
+        gx, gy = np.random.random(size=2) * 0.1 + g
+        human.set(px, py, gx, gy, 0, 0, 0)
+        return human
 
     # generate and return a static human
     # position: (px, py) for fixed position, or None for random position
@@ -478,23 +505,31 @@ class CrowdSim(gym.Env):
 
         # for FoV environment
         else:
-            if self.robot.kinematics == 'unicycle':
-                angle = np.random.uniform(0, np.pi * 2)
-                px = self.circle_radius * np.cos(angle)
-                py = self.circle_radius * np.sin(angle)
-                while True:
-                    gx, gy = np.random.uniform(-self.circle_radius, self.circle_radius, 2)
-                    if np.linalg.norm([px - gx, py - gy]) >= 6:  # 1 was 6
-                        break
-                self.robot.set(px, py, gx, gy, 0, 0, np.random.uniform(0, 2*np.pi)) # randomize init orientation
+            if self.test_setting is None:
+                if self.robot.kinematics == 'unicycle':
+                    angle = np.random.uniform(0, np.pi * 2)
+                    px = self.circle_radius * np.cos(angle)
+                    py = self.circle_radius * np.sin(angle)
+                    while True:
+                        gx, gy = np.random.uniform(-self.circle_radius, self.circle_radius, 2)
+                        if np.linalg.norm([px - gx, py - gy]) >= 6:  # 1 was 6
+                            break
+                    self.robot.set(px, py, gx, gy, 0, 0, np.random.uniform(0, 2*np.pi)) # randomize init orientation
 
-            # randomize starting position and goal position
+                # randomize starting position and goal position
+                else:
+                    while True:
+                        px, py, gx, gy = np.random.uniform(-self.circle_radius, self.circle_radius, 4)
+                        if np.linalg.norm([px - gx, py - gy]) >= 6:
+                            break
+                    self.robot.set(px, py, gx, gy, 0, 0, np.pi/2)
             else:
-                while True:
-                    px, py, gx, gy = np.random.uniform(-self.circle_radius, self.circle_radius, 4)
-                    if np.linalg.norm([px - gx, py - gy]) >= 6:
-                        break
-                self.robot.set(px, py, gx, gy, 0, 0, np.pi/2)
+                px, py = 0, 0
+                gx, gy = 3.6, 4.5
+                if self.robot.kinematics == 'unicycle':
+                    self.robot.set(px, py, gx, gy, 0, 0, np.random.uniform(0, 2*np.pi)) # randomize init orientation
+                else:
+                    self.robot.set(px, py, gx, gy, 0, 0, np.pi/2)
 
 
             # generate humans
@@ -931,6 +966,8 @@ class CrowdSim(gym.Env):
         ax=self.render_axis
         artists=[]
 
+        ax.set_xlim([-0.5, 5])
+        ax.set_ylim([-0.5, 5])
         # add goal
         goal=mlines.Line2D([self.robot.gx], [self.robot.gy], color=goal_color, marker='*', linestyle='None', markersize=15, label='Goal')
         ax.add_artist(goal)
@@ -1008,7 +1045,7 @@ class CrowdSim(gym.Env):
             plt.text(self.humans[i].px - 0.1, self.humans[i].py - 0.1, str(i), color='black', fontsize=12)
 
 
-        plt.pause(0.1)
+        plt.pause(0.01)
         for item in artists:
             item.remove() # there should be a better way to do this. For example,
             # initially use add_artist and draw_artist later on
