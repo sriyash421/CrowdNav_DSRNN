@@ -13,7 +13,7 @@ class Config(object):
     env = BaseConfig()
     env.env_name = 'CrowdSimDict-v0'  # name of the environment
     env.time_limit = 50 # time limit of each episode (second)
-    env.time_step = 0.25 # length of each timestep/control frequency (second)
+    env.time_step = 0.1 # length of each timestep/control frequency (second)
     env.val_size = 100
     env.test_size = 500 # number of episodes for test.py
     env.randomize_attributes = True # randomize the preferred velocity and radius of humans or not
@@ -34,7 +34,7 @@ class Config(object):
     sim = BaseConfig()
     sim.render = False # show GUI for visualization
     sim.circle_radius = 6 # radius of the circle where all humans start on
-    sim.human_num = 5 # total number of humans
+    sim.human_num = 3 # total number of humans
     # Group environment: set to true; FoV environment: false
     sim.group_human = False
 
@@ -49,11 +49,11 @@ class Config(object):
     humans.FOV = 2.
 
     # a human may change its goal before it reaches its old goal
-    humans.random_goal_changing = True
+    humans.random_goal_changing = False
     humans.goal_change_chance = 0.25
 
     # a human may change its goal after it reaches its old goal
-    humans.end_goal_changing = True
+    humans.end_goal_changing = False
     humans.end_goal_change_chance = 1.0
 
     # a human may change its radius and/or v_pref after it reaches its current goal
@@ -81,7 +81,7 @@ class Config(object):
 
     # robot settings
     robot = BaseConfig()
-    robot.visible = False  # the robot is visible to humans
+    robot.visible = True  # the robot is visible to humans
     # robot policy: srnn for now
     robot.policy = 'vecmpc'
     robot.radius = 0.3  # radius of the robot
@@ -91,7 +91,7 @@ class Config(object):
 
     # add noise to observation or not
     noise = BaseConfig()
-    noise.add_noise = False
+    noise.add_noise = True
     # uniform, gaussian
     noise.type = "uniform"
     noise.magnitude = 0.1
@@ -109,8 +109,10 @@ class Config(object):
     with open(path, "r") as fin:
         MPC = yaml.safe_load(fin)
     print(MPC)
-    MPC['params']['dt'] = env.time_step
-    MPC['params']['prediction_length'] = 1.5
+    MPC['params']['dt'] = 0.2
+    MPC['params']['prediction_length'] = 1.2
 
     save_path = "results"
     exp_name = "test"
+
+    test_setting = "cooperative"
