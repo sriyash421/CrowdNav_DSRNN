@@ -82,7 +82,7 @@ def evaluate(config, env, visualize=False):
             #     if 'episode' in info.keys():
             #         eval_episode_rewards.append(info['episode']['r'])
 
-
+        eval_episode_rewards.append(episode_rew)
         print('')
         print('Reward={}'.format(episode_rew))
         print('Episode', k, 'ends in', stepCounter)
@@ -108,6 +108,8 @@ def evaluate(config, env, visualize=False):
 
         cumulative_rewards.append(sum([pow(gamma, t * env.robot.time_step * env.robot.v_pref)
                                        * reward for t, reward in enumerate(rewards)]))
+        
+        env.robot.policy.reset()
 
 
     success_rate = success / test_size
@@ -119,7 +121,7 @@ def evaluate(config, env, visualize=False):
 
     extra_info = ''
     phase = 'test'
-    logging.info(
+    print(
         '{:<5} {}has success rate: {:.2f}, collision rate: {:.2f}, timeout rate: {:.2f}, '
         'nav time: {:.2f}, total reward: {:.4f}'.
             format(phase.upper(), extra_info, success_rate, collision_rate, timeout_rate, avg_nav_time,
@@ -130,20 +132,19 @@ def evaluate(config, env, visualize=False):
             avg_min_dist = np.average(min_dist)
         else:
             avg_min_dist = float("nan")
-        logging.info('Frequency of being in danger: %.2f and average min separate distance in danger: %.2f',
+        print('Frequency of being in danger: %.2f and average min separate distance in danger: %.2f',
                      too_close * env.robot.time_step / total_time, avg_min_dist)
 
-    logging.info(
+    print(
         '{:<5} {}has average path length: {:.2f}, CHC: {:.2f}'.
             format(phase.upper(), extra_info, sum(path_lengths) / test_size, sum(chc_total) / test_size))
-    logging.info('Collision cases: ' + ' '.join([str(x) for x in collision_cases]))
-    logging.info('Timeout cases: ' + ' '.join([str(x) for x in timeout_cases]))
+    print('Collision cases: ' + ' '.join([str(x) for x in collision_cases]))
+    print('Timeout cases: ' + ' '.join([str(x) for x in timeout_cases]))
 
     print(" Evaluation using {} episodes: mean reward {:.5f}\n".format(
         len(eval_episode_rewards), np.mean(eval_episode_rewards)))
 
-
-if __name__ == "__main__":
+def main():
     config = Config()
     env = CrowdSim()
     env.configure(config)
@@ -152,4 +153,7 @@ if __name__ == "__main__":
     env.nenv = 1
     env.seed(0)
 
-    evaluate(config, env, True)
+    evaluate(config, env, False)
+
+if __name__ == "__main__":
+    main()

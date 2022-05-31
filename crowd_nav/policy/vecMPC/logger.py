@@ -5,6 +5,8 @@ import pickle
 
 class BaseLogger(object):
     def __init__(self, save_path, model, name):
+        print(save_path)
+
         self.save_path = os.path.join(save_path, model, name)
         os.makedirs(self.save_path, exist_ok=True)
 
@@ -12,6 +14,7 @@ class BaseLogger(object):
         self.ballbot = []
         self.predictions = []
         self.time_log = []
+        self.episode_num = 0
 
     def reset(self):
         if self.trajectory is not None:

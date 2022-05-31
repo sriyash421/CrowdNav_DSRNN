@@ -15,7 +15,7 @@ class Config(object):
     env.time_limit = 50 # time limit of each episode (second)
     env.time_step = 0.1 # length of each timestep/control frequency (second)
     env.val_size = 100
-    env.test_size = 500 # number of episodes for test.py
+    env.test_size = 100 # number of episodes for test.py
     env.randomize_attributes = True # randomize the preferred velocity and radius of humans or not
     env.seed = 0  # random seed for environment
 
@@ -43,7 +43,7 @@ class Config(object):
     humans.visible = True # a human is visible to other humans and the robot
     # policy to control the humans: orca or social_force
     humans.policy = "orca"
-    humans.radius = 0.3 # radius of each human
+    humans.radius = 0.2 # radius of each human
     humans.v_pref = 0.8 # max velocity of each human
     # FOV = this values * PI
     humans.FOV = 2.
@@ -112,7 +112,7 @@ class Config(object):
     MPC['params']['dt'] = 0.2
     MPC['params']['prediction_length'] = 1.2
 
-    save_path = "results"
+    save_path = "test"
     exp_name = "test"
 
     test_setting = "cooperative"
