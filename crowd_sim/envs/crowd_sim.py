@@ -210,10 +210,10 @@ class CrowdSim(gym.Env):
         else:
             p = (3.6, 0)
             g = (0, 4.5)
-            
+
         human = Human(self.config, 'humans')
-        px, py = np.random.random(size=2) * 0.1 + p
-        gx, gy = np.random.random(size=2) * 0.1 + g
+        px, py = p + np.random.uniform(-0.5, 0.5, size=2)
+        gx, gy = g + np.random.uniform(-0.5, 0.5, size=2)
         human.set(px, py, gx, gy, 0, 0, 0)
         return human
 
