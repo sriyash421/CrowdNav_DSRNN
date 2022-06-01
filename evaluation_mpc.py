@@ -144,6 +144,16 @@ def evaluate(config, env, visualize=False):
     print(" Evaluation using {} episodes: mean reward {:.5f}\n".format(
         len(eval_episode_rewards), np.mean(eval_episode_rewards)))
 
+def main_config(config):
+    env = CrowdSim()
+    env.configure(config)
+
+    env.thisSeed = 0
+    env.nenv = 1
+    env.seed(0)
+
+    evaluate(config, env, False)
+
 def main():
     config = Config()
     env = CrowdSim()
@@ -153,7 +163,7 @@ def main():
     env.nenv = 1
     env.seed(0)
 
-    evaluate(config, env, False)
+    evaluate(config, env, True)
 
 if __name__ == "__main__":
     main()
